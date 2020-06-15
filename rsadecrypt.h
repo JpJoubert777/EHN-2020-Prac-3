@@ -17,3 +17,11 @@ void mpzToStr(mpz_t o, unsigned char * decryptedfileKey);
  * @return void
  */
 void rsaDecrypt(unsigned char * decryptedRC4fileKey, mpz_t c, mpz_t d, mpz_t n);
+
+int main(int argc, char* argv[]);
+
+void printHelp();
+
+void printUsage();
+
+void printError();

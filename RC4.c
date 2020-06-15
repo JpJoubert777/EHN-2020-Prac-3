@@ -67,10 +67,11 @@ void RC4Encrypt(unsigned char * plainText,unsigned char * cypherText,int numPlai
 	unsigned char * RC4Stream;
 	
 	rc4ctx_t rc4Context;
-
+	
 	RC4Stream = malloc(numPlaintextBytes +1);
 	rc4_init(&rc4Context,key,keyLength);
 	generateStream(RC4Stream,numPlaintextBytes,&rc4Context);
+	
 
 	printf("\nPlainText:\n");
 	for (int i = 0; i < numPlaintextBytes; i ++)
@@ -200,6 +201,16 @@ int main(int argc, char* argv[]) {
 	if (fkey == NULL) {
 		printf("Enter the key: ");
 		scanf("%s", key);
+		for (keyLen = 0; keyLen< 16; keyLen++) {
+			if (key[keyLen] == 0)
+				break;
+		}
+
+		if (keyLen == 0 || keyLen > 16)
+			printError("Please Enter Valid Key!");
+
+
+
 	}
 	else {
 		keyFile = fopen(fkey, "r");
@@ -242,6 +253,7 @@ int main(int argc, char* argv[]) {
 
 	fiBuffer = (unsigned char *)calloc(bufSize, sizeof(char)); 	// Allocate 1MB space by default 
 	
+	
 	while (1) {
 		c = fgetc(rFile);
 		if (c == EOF)
@@ -256,8 +268,11 @@ int main(int argc, char* argv[]) {
 	}
 
 	
-	if (edflg) // encrypt
+	if (edflg) {// encrypt 
+		printf("Calling Encrypt:\n");
 		RC4Encrypt(fiBuffer, foBuffer, numBytes, key, keyLen);
+	}
+	
 	else 
 		RC4Decrypt(foBuffer, fiBuffer, numBytes, key, keyLen);
 

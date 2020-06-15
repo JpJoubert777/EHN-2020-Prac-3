@@ -60,3 +60,7 @@ void RC4Decrypt(unsigned char * plainText,unsigned char * cypherText,int numPlai
 int main(int argc, char* argv[]);
 
 void printHelp();
+
+void printUsage();
+
+void printError();
