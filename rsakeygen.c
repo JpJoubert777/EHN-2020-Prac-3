@@ -197,9 +197,11 @@ int main(int argc, char* argv[]) {
 	
 	
 
-	char *fpriv = NULL, *fpub = NULL;
+	char *fpriv = NULL, *fpub = NULL; // file pointers
 	unsigned char *key = NULL;
 	int bitLen = 0, keyLen = 0;
+
+	char *nonInts = NULL;
 
 
 	FILE *priv = NULL, *pub = NULL;
@@ -227,7 +229,7 @@ int main(int argc, char* argv[]) {
         switch (c) // stores values sent in through command line to be used by encryption and decryption algos
         {
 			case 'a':
-                bitLen = optarg;
+                bitLen = strtol(optarg, nonInts, 10); // bitLen is an integer
                 break;
 
             case 'b':
@@ -259,9 +261,11 @@ int main(int argc, char* argv[]) {
 	}
 
 	if (keyLen == 0 || keyLen > 16) {
-		printf("%i\n", keyLen);
 		printError("Please Enter Valid Key!");
 	}
+
+	if (nonInts!= NULL)
+		printError("Please Enter Valid bitLen!");
 		
 
 	padZeroes(key, keyLen);
