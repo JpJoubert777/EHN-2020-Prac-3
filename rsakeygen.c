@@ -192,6 +192,15 @@ void printError(char *message) {
     exit(0);
 }
 
+/**
+ * @brief      The main function which interprets the terminal command, keys-files and operations are defined here
+ *  
+ *
+ * @param[in]  argc  The count of arguments
+ * @param      argv  The arguments array
+ *
+ * @return     returns 0 when complete
+ */
 int main(int argc, char* argv[]) {
 
 	
