@@ -7,8 +7,8 @@ rsaencrypt: rsaencrypt.o
 rsadecrypt: rsadecrypt.o 
 	gcc -o rsadecrypt rsadecrypt.o -lgmp
 
-rsakeygen: rsakeygen.o RC4.o 
-	gcc -o rsakeygen rsakeygen.o RC4.o -lgmp
+rsakeygen: rsakeygen.o
+	gcc -o rsakeygen rsakeygen.o -lgmp
 
 RC4: RC4.o
 	gcc -o RC4 RC4.o

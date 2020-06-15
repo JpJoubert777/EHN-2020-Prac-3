@@ -113,7 +113,7 @@ void RC4Decrypt(unsigned char * plainText,unsigned char * cypherText,int numPlai
 	printf("\n\n");
 }
 
-void padZeroes(unsigned char * key, int keylen)
+void padZero(unsigned char * key, int keylen)
 {
 
 	if (keylen < 16)
@@ -235,7 +235,7 @@ int main(int argc, char* argv[]) {
 	if (keyLen == 0 || keyLen > 16)
 		printError("Please Enter Valid Key!");
 
-	padZeroes(key, keyLen);
+	padZero(key, keyLen);
 
 	
 

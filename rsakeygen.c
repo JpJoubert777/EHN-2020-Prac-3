@@ -3,9 +3,60 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include "RC4.h"
+#include <getopt.h> 
 
-rc4ctx_t rc4RNGContext; 
+typedef struct
+{
+	unsigned char S[256];
+	int i;
+	int j;
+} rc4ctx_t;
+
+rc4ctx_t rc4RNGContext;
+
+void rc4_init(rc4ctx_t* rc4c, unsigned char * key, int keylen)
+{
+
+	unsigned char temp; //used for the swapping 
+	unsigned char T[256]; //temporary storage for key operations
+	// Initialization
+	for (int i = 0; i < 256; i++)
+	{
+		rc4c->S[i] = i;
+		T[i] = key[i % keylen];
+	}
+	//initial permutation of S
+	int j = 0;
+	for (int i = 0; i < 256; i++)
+	{
+		j = (j + rc4c->S[i] + T[i]) % 256;
+		// swap S[i] and S[j]
+		temp = rc4c->S[i];
+		rc4c->S[i] = rc4c->S[j];
+		rc4c->S[j] = temp;
+	}
+	//initial context values
+	rc4c->i = 0;
+	rc4c->j = 0;
+}
+
+unsigned char  rc4_getByte(rc4ctx_t* rc4c)
+{
+	unsigned char temp; //used for the swapping
+	unsigned char t; //temporary indexing variable
+	unsigned char k; //will be the returned byte 
+
+	rc4c->i = (rc4c->i + 1) % 256;
+	rc4c->j = (rc4c->j + rc4c->S[rc4c->i]) % 256;
+	// swap S[i] and S[j]
+	temp = rc4c->S[rc4c->i];
+	rc4c->S[rc4c->i] = rc4c->S[rc4c->j];
+	rc4c->S[rc4c->j] = temp;
+	t = (rc4c->S[rc4c->i] + rc4c->S[rc4c->j]) % 256;
+	k = rc4c->S[t];
+	return k;
+	
+}
 
 
 void rsa_init(rsactx_t * rsactx)
@@ -136,3 +187,132 @@ void generateKeyRSA(unsigned char * RNGkey,int RNGkeyLength,int numNeededRSAKeyB
 	mpz_clear(gcd);
 }
 
+void printError(char *message) {
+    fprintf(stderr, "%s See Usage.\n", message);
+    exit(0);
+}
+
+int main(int argc, char* argv[]) {
+
+	
+	
+
+	char *fpriv = NULL, *fpub = NULL;
+	unsigned char *key = NULL;
+	int bitLen = 0, keyLen = 0;
+
+
+	FILE *priv = NULL, *pub = NULL;
+	
+	char c = 0;
+	while (1) {
+        static struct option long_options[] = 
+        {
+			{"bitLen", required_argument, 0, 'a'},
+			{"fopub", required_argument, 0, 'b'},
+            {"fopriv", required_argument, 0, 'c'},
+            {"init", required_argument, 0, 'd'},
+            {0,0,0,0} // shows end of list
+        };
+
+		
+        int option_index = 0;
+        opterr = 0;
+        c = getopt_long_only (argc, argv, "a:b:c:d:", long_options, option_index);
+
+		/* Detect the end of the options. */
+        if (c == -1)
+            break;
+
+        switch (c) // stores values sent in through command line to be used by encryption and decryption algos
+        {
+			case 'a':
+                bitLen = optarg;
+                break;
+
+            case 'b':
+                fpub = optarg;
+                break;
+            
+            case 'c':
+                fpriv = optarg;
+                break;
+
+			case 'd':
+                key = optarg;
+                break;
+
+			default: // reaches here if invalid parameter or no argument
+                printError("Invalid command!");
+                break;
+		}
+	}
+
+	if (fpriv == NULL || fpub == NULL || bitLen <= 0 || key == NULL) {
+		printError("Invalid command!");
+	}
+
+
+	for (keyLen = 0; keyLen< 17; keyLen++) {
+		if (key[keyLen] == 0)
+			break;
+	}
+
+	if (keyLen == 0 || keyLen > 16) {
+		printf("%i\n", keyLen);
+		printError("Please Enter Valid Key!");
+	}
+		
+
+	padZeroes(key, keyLen);
+
+	   
+
+	 
+	// don't waste time processing the file if output file can't be created
+    priv = fopen(fpriv, "w+");
+    if (fpriv == NULL) {
+        fprintf(stderr, "Could not open or create file: %s\n", fpriv);
+        return 0;
+    }
+
+	pub = fopen(fpub, "w+");
+    if (fpub == NULL) {
+        fprintf(stderr, "Could not open or create file: %s\n", fpub);
+        return 0;
+	}
+
+	generateKeyRSA(key, keyLen, bitLen);
+
+	char * n = mpz_get_str(NULL,10, rsaContext.n);
+	char * cd = mpz_get_str(NULL,10, rsaContext.d);
+	char * ce = mpz_get_str(NULL,10, rsaContext.e);
+
+	fprintf(pub, "%s\n", n);
+	fprintf(priv, "%s\n", n);
+
+	fprintf(pub, "%s\n", ce);
+	fprintf(priv, "%s\n", cd);
+	
+	if (pub != NULL)
+		fclose(pub);
+	if (priv != NULL)	
+		fclose(priv);	
+
+
+	// code adapted from Zeta's answer at:
+	//https://stackoverflow.com/questions/15691477/c-mpir-mpz-t-to-stdstring
+	// In order to free the memory we need to get the right free function:
+	void (*freefunc)(void *, size_t);
+	mp_get_memory_functions (NULL, NULL, &freefunc);
+
+	// In order to use free one needs to give both the pointer and the block
+	// size. For tmp this is strlen(tmp) + 1, see [1].
+	freefunc(cd, strlen(cd) + 1);
+	freefunc(ce, strlen(ce) + 1);
+
+	rsa_clear(&rsaContext);
+
+	return 0;
+
+}
