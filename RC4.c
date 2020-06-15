@@ -70,6 +70,7 @@ void RC4Encrypt(unsigned char * plainText,unsigned char * cypherText,int numPlai
 	
 	RC4Stream = malloc(numPlaintextBytes +1);
 	rc4_init(&rc4Context,key,keyLength);
+	
 	generateStream(RC4Stream,numPlaintextBytes,&rc4Context);
 	
 
@@ -79,14 +80,20 @@ void RC4Encrypt(unsigned char * plainText,unsigned char * cypherText,int numPlai
 		printf("%c",plainText[i]);
 	}
 	printf("\n");
-
+	
 	printf("\nRC4 Encrypt: \n");
 	for (int x = 0; x < numPlaintextBytes; x++)
 	{
+		printf("%i\n",x);
+		printf("%c\n", RC4Stream[x]);
+		printf("%c\n", plainText[x]);
+		
 		cypherText[x] = plainText[x] ^ RC4Stream[x];
+		printf("XOR\n");
 		printf("%02x ",cypherText[x]);
 	}
 	printf("\n\n");
+	
 }
 
 void RC4Decrypt(unsigned char * plainText,unsigned char * cypherText,int numPlaintextBytes, unsigned char * key, int keyLength)
@@ -269,7 +276,7 @@ int main(int argc, char* argv[]) {
 
 	
 	if (edflg) {// encrypt 
-		printf("Calling Encrypt:\n");
+		printf("Calling Encrypt: %i\n", numBytes);
 		RC4Encrypt(fiBuffer, foBuffer, numBytes, key, keyLen);
 	}
 	
