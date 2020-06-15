@@ -18,3 +18,8 @@ Thirdly, RSA encryption. See example of encryption using the 'rsaencrypt' below.
 Finally, decryption using RSA. See example below.
 
 ./rsadecrypt -fi rsa_encrypted.rsa -fopriv priv.txt -fo decrypted_key.txt
+
+MakeFile generation:
+RC4: make RC4
+RSA Keygen: make rsakeygen
+RSA Encryption: make rsaencrypt
