@@ -1,0 +1,20 @@
+This usage file contains insturctions on how to execute the following algorithms correctly.
+
+Please note similarities between this document and EHN P3 Instructions are similar due to the nature of the practical.
+
+Firstly, a key must be generated. This refers to the 'rsakeygen', see an example of execution below.
+
+./rsakeygen -bitLen 1024 -fopub pubkey.txt -fopriv privatekey.txt -init "RC4initkey"
+
+Secondly, encrypting different file types. This refers to the 'rc4', see an example below.
+
+./rc4 -e -fi test.txt -fo rc4_testfile.rc4 -key rc4key.txt
+./rc4 -d -fi doe.rc4 -fo rc4_testfile.png -key rc4key.txt
+
+Thirdly, RSA encryption. See example of encryption using the 'rsaencrypt' below.
+
+./rsaencrypt -key "MyKeyis12334" -fo rsa_encrypt.rsa -fopub pubkey.txt
+
+Finally, decryption using RSA. See example below.
+
+./rsadecrypt -fi rsa_encrypted.rsa -fopriv priv.txt -fo decrypted_key.txt
