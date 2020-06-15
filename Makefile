@@ -2,13 +2,13 @@ main: main.o RC4.o rsakeygen.o rsaencrypt.o rsadecrypt.o
 	gcc -o main main.o RC4.o rsakeygen.o rsaencrypt.o rsadecrypt.o  -lgmp
 
 rsaencrypt: rsaencrypt.o 
-	gcc -o rsaencrypt rsaencrypt.o 
+	gcc -o rsaencrypt rsaencrypt.o -lgmp
 
 rsadecrypt: rsadecrypt.o 
-	gcc -o rsadecrypt rsadecrypt.o 
+	gcc -o rsadecrypt rsadecrypt.o -lgmp
 
 rsakeygen: rsakeygen.o RC4.o 
-	gcc -o rsakeygen rsakeygen.o RC4.o 
+	gcc -o rsakeygen rsakeygen.o RC4.o -lgmp
 
 RC4: RC4.o
 	gcc -o RC4 RC4.o

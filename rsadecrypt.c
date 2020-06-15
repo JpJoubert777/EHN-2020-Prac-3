@@ -51,25 +51,30 @@ void rsaDecrypt(unsigned char * decryptedRC4fileKey, mpz_t c, mpz_t d, mpz_t n)
 }
 
 
-void printUsage() {
-	printf("USAGE\n");
+
+void padZeroes(unsigned char * key, int keylen)
+{
+
+	if (keylen < 16)
+	{
+		for (int i = keylen; i < 16; i ++)
+		{
+			key[i] = 0;
+		}
+			
+	}
+
 }
+
 
 void printError(char *message) {
     fprintf(stderr, "%s See Usage.\n", message);
-    printUsage();
     exit(0);
-}
-
-void printHelp() {
-	printf("HELP!!!\n");
-	printUsage();
-	exit(0);
 }
 
 int main(int argc, char* argv[]) {
 
-	static int hflg = 0;
+	
 	static int edflg = 0;
 
 	char *fi = NULL, *fo = NULL, *fkey = NULL;
@@ -88,7 +93,7 @@ int main(int argc, char* argv[]) {
         {
             {"e", no_argument, &edflg, 2}, // stores all the possible arguments in a list
             {"d", no_argument, &edflg, 1},
-            {"h", no_argument, &hflg, 1},
+            // {"h", no_argument, &hflg, 1},
 			{"fi", required_argument, 0, 'a'},
             {"fo", required_argument, 0, 'b'},
             {"key", required_argument, 0, 'c'},
@@ -127,11 +132,7 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	// NOTE: all print utility functions will exit the program after showing the messages
-    if (hflg == 1) 
-        printHelp();
-
-    if (edflg == 0) 
+	if (edflg == 0) 
         printError("Please specify Encryption or Decrytion mode!");
 	
 	edflg--; // move edflg from 1 and 2 to 0 and 1
@@ -144,6 +145,10 @@ int main(int argc, char* argv[]) {
 	if (fkey == NULL) {
 		printf("Enter the key: ");
 		scanf("%s", key);
+		for (keyLen = 0; keyLen< 16; keyLen++) {
+			if (key[keyLen] == 0)
+				break;
+		}
 	}
 	else {
 		keyFile = fopen(fkey, "r");
@@ -164,10 +169,14 @@ int main(int argc, char* argv[]) {
 				key[keyLen++] = c;		
 			}
 		}
-
 	}
 
-	 
+	if (keyLen == 0 || keyLen > 16)
+		printError("Please Enter Valid Key!");
+
+	padZeroes(key, keyLen);
+
+	
 
 	// Open and hold the files
 	rFile = fopen(fi, "r");
@@ -186,6 +195,7 @@ int main(int argc, char* argv[]) {
 
 	fiBuffer = (unsigned char *)calloc(bufSize, sizeof(char)); 	// Allocate 1MB space by default 
 	
+	
 	while (1) {
 		c = fgetc(rFile);
 		if (c == EOF)
@@ -199,17 +209,26 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
+	foBuffer = (unsigned char *)calloc(numBytes+1, sizeof(char));
 	
-
-	
-	if (edflg) // encrypt
+	if (edflg) {// encrypt 
+		printf("Calling Encrypt: %i\n", numBytes);
 		RC4Encrypt(fiBuffer, foBuffer, numBytes, key, keyLen);
+	}
 	else 
 		RC4Decrypt(foBuffer, fiBuffer, numBytes, key, keyLen);
 
-	fclose(keyFile);
-	fclose(rFile);
-	fclose(wFile);	
+	for (int i = 0; i < numBytes; i++){
+		fputc(foBuffer[i], wFile);
+	}
+	
+
+	if (keyFile != NULL)
+		fclose(keyFile);
+	if (rFile != NULL)	
+		fclose(rFile);
+	if (wFile != NULL)
+		fclose(wFile);	
 
 	return 0;
 
