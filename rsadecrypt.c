@@ -200,6 +200,8 @@ int main(int argc, char* argv[]) {
 	}
 
 	
+
+	
 	if (edflg) // encrypt
 		RC4Encrypt(fiBuffer, foBuffer, numBytes, key, keyLen);
 	else 
