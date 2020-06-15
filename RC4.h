@@ -56,3 +56,7 @@ void RC4Encrypt(unsigned char * plainText,unsigned char * cypherText,int numPlai
  * @return void
  */
 void RC4Decrypt(unsigned char * plainText,unsigned char * cypherText,int numPlaintextBytes, unsigned char * key, int keyLength);
+
+int main(int argc, char* argv[]);
+
+void printHelp();
